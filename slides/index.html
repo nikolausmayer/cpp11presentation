@@ -108,8 +108,10 @@
               <li> C++11 adds to the core language and the Standard Library </li>
             </ul>
           </div>
-          <img src='./assets/img/isocpp_timeline.png'
-               /><br/>
+          <div class='fragment'>
+            <img src='./assets/img/isocpp_timeline.png'
+                 /><br/>
+          </div>
         </section>
 
 
@@ -129,15 +131,17 @@
               <li> Compile with <code>-std=c++11</code> (<code>-std=c++0x</code> for GCC &le; 4.6) </li>
             </ul>
           </div>
-          <h4> ... and why <em>should</em> I? </h4>
-          <div style='text-align: left;'>
-            <ul>
-              <li> We'll get to that </li>
-              <li> You don't lose anything (few exotic breaking changes*) </li>
-            </ul>
-            <br/>
-            <br/>
-            <small>*) <a href='http://stackoverflow.com/a/6402166'>http://stackoverflow.com/a/6402166</a> </small>
+          <div class='fragment'>
+            <h4> ... and why <em>should</em> I? </h4>
+            <div style='text-align: left;'>
+              <ul>
+                <li> We'll get to that </li>
+                <li> You don't lose anything (few exotic breaking changes*) </li>
+              </ul>
+              <br/>
+              <br/>
+              <small>*) <a href='http://stackoverflow.com/a/6402166'>http://stackoverflow.com/a/6402166</a> </small>
+            </div>
           </div>
         </section>
 
@@ -161,21 +165,23 @@
           <h3> The elephant in the room: <code style='text-transform: none;'>auto</code> </h3>
           <div style='text-align: left;'>
             <ul>
-              <li>The <code>auto</code> <em>keyword</em> is not new, but its meaning has changed </li>
-              <li>Before: Storage class specifier (cf. <code>static</code>, <code>extern</code>) </li>
-              <li>Now: Automatic type deduction:
+              <li class='fragment'>The <code>auto</code> <em>keyword</em> is not new, but its meaning has changed </li>
+              <li class='fragment'>Before: Storage class specifier (cf. <code>static</code>, <code>extern</code>) </li>
+              <li class='fragment'>Now: Automatic type deduction:
                 <pre><code data-trim class='cpp'>
 float almostpi = 3.14f;
 std::vector&lt;SomeClass&lt;SomeType&gt; &gt;::iterator it = myvec.begin();
-                </code></pre>
+              </code></pre>
+              <div class='fragment'>
                 can become
                 <pre><code data-trim class='cpp'>
 auto almostpi = 3.14f;
 auto it = myvec.begin();
                 </code></pre>
+              </div>
               </li>
-              <li> Type deduction happens at compile time </li>
-              <li> Important: In general, <code>auto</code> ignores references and <code>const</code>/<code>volatile</code> (there are special cases) </li>
+              <li class='fragment'> Type deduction happens at compile time </li>
+              <li class='fragment'> Important: In general, <code>auto</code> ignores references and <code>const</code>/<code>volatile</code> (there are special cases) </li>
             </ul>
           </div>
         </section>
@@ -191,15 +197,17 @@ auto add(T1 t1, T2 t2) {
 auto v = add(2, 3.14);
           </code></pre>
           <div style='text-align: left;'>
-            does not work. But with a <em>trailing return type</em>, it can:
+            does not work. <span class='fragment'>But with a <em>trailing return type</em>, it can:</span>
           </div>
-          <pre><code data-trim class='cpp'>
+          <div class='fragment'>
+            <pre><code data-trim class='cpp'>
 template &lt;typename T1, typename T2&gt;
 auto add(T1 t1, T2 t2) -&gt; decltype(t1 + t2) {
   return t1 + t2;
 }
 auto v = add(2, 3.14);
-          </code></pre>
+            </code></pre>
+          </div>
         </section>
 
 
@@ -207,45 +215,48 @@ auto v = add(2, 3.14);
           <h3> “Trailing” return type? </h3>
           <div style='text-align: left;'>
             <code>decltype</code> can do anything that <code>auto</code> can. Why not write...
-            <pre><code data-trim class='cpp'>
+            <div class='fragment'>
+              <pre><code data-trim class='cpp'>
 template &lt;typename T1, typename T2&gt;
 decltype(t1 + t2) add(T1 t1, T2 t2) {     // (a)
   return t1 + t2;
 }
 decltype(add(2, 3.14)) v = add(2, 3.14);  // (b)
-            </code></pre>
+              </code></pre>
+            </div>
             <ul>
-              <li> (a) <code>t1</code> and <code>t2</code> are technically unknown at that point </li>
-              <li> (b) This is just cumbersome </li>
+              <li class='fragment'> (a) <code>t1</code> and <code>t2</code> are technically unknown at that point </li>
+              <li class='fragment'> (b) This is just cumbersome </li>
             </ul>
             <br/>
             <br/>
 
-            C++14 (<code>-std=c++1y</code> in GCC 4.8, <code>-std=c++14</code> in GCC&ge;4.9):
-            <pre><code data-trim class='cpp'>
+            <div class='fragment'>
+              C++14 (<code>-std=c++1y</code> in GCC 4.8, <code>-std=c++14</code> in GCC&ge;4.9):
+              <pre><code data-trim class='cpp'>
 template &lt;typename T1, typename T2&gt;
 auto add(T1 t1, T2 t2) {
   return t1 + t2;
 }
-            </code></pre>
-            <small> *) <a href='http://thbecker.net/articles/auto_and_decltype/section_01.html'> http://thbecker.net/articles/auto_and_decltype/section_01.html </a> </small>
+              </code></pre>
+            </div>
           </div>
         </section>
 
 
         <section>
-          <h3> With great power </h3>
+          <h3> With great power <br/>
+               comes great responsibility</h3>
           <pre><code data-trim class='cpp'>
 int i = 5;
 ProbabilityModel obj = m[i];
 std::pair&lt;int,int&gt; p = m_hocos[0];
 std::cout &lt;&lt; obj.prob(p);
           </code></pre>
-          <h3> comes great responsibility</h3>
           <table>
             <tr>
               <td>
-          <pre><code data-trim class='cpp'>
+          <pre class='fragment'><code data-trim class='cpp'>
 auto i = 5;
 auto obj = m[i];
 auto p = m_hocos[0];
@@ -253,7 +264,7 @@ std::cout &lt;&lt; obj.prob(p);
           </code></pre>
               </td>
               <td width='auto'>
-          <pre><code data-trim class='cpp'>
+          <pre class='fragment'><code data-trim class='cpp'>
 int idx = 5;
 auto model = prob_models[idx];
 auto point = m_homogeneous_coords[0];
@@ -262,7 +273,7 @@ std::cout &lt;&lt; model.prob(point);
               </td>
             </tr>
           </table>
-          <div style='text-align: left;'>
+          <div style='text-align: left;' class='fragment'>
             <code>auto</code> is a double-edged sword. If you let it loose, it will destroy your code. Use it wisely, and keep in mind: Either declaration or handle must be informative.
           </div>
         </section>
@@ -271,31 +282,35 @@ std::cout &lt;&lt; model.prob(point);
         <section>
           <h3> Range-for loops </h3>
           <div style='text-align: left;'>
-            This is nice:
+            Accessing single elements is readable:
           </div>
           <pre><code data-trim class='cpp'>
 auto point = m_homogeneous_coords[0];
 std::cout &lt;&lt; model.prob(point);
           </code></pre>
 
-          <div style='text-align: left;'>
-            But in our code, we iterate over all entries:
-          </div>
-          <pre><code data-trim class='cpp'>
+          <div class='fragment'>
+            <div style='text-align: left;'>
+              But when iterating over e.g. a <code>std::vector</code>
+            </div>
+            <pre><code data-trim class='cpp'>
 for (unsigned int i = 0; i &lt; m_homogeneous_coords.size(); ++i)
   std::cout &lt;&lt; model.prob(m_homogeneous_coords[i]);
-          </code></pre>
-
-          <div style='text-align: left;'>
-            This is boilerplate because we do not actually care about <code>i</code>. The “good” solution (which also works for e.g. <code>std::map</code>) is far, far worse still:
+            </code></pre>
           </div>
 
-          <pre><code data-trim class='cpp'>
+          <div style='text-align: left;'>
+            <span class='fragment'>The default solution includes boilerplate code because we do not actually care about <code>i</code>.</span> <span class='fragment'>The “good” solution (which also works for e.g. <code>std::map</code>) is far worse still:</span>
+          </div>
+
+          <div class='fragment'>
+            <pre><code data-trim class='cpp'>
 for (std::vector&lt;std::pair&lt;int,int&gt; &gt;::iterator it = m_...begin();
      it != m_homogeneous_coords.end();
      ++it)
   std::cout &lt;&lt; model.prob(*it);
-          </code></pre>
+            </code></pre>
+          </div>
         </section>
 
 
@@ -312,22 +327,26 @@ for point in m_homogeneous_coords:
           </code></pre>
 
           <div style='text-align: left;'>
-            which is infinitely more intuitive. Luckily, with C++11 the following is not only legal, but preferred:
+            which is infinitely more intuitive. <span class='fragment'>Luckily, with C++11 the following is not only legal, but preferred:</span>
           </div>
-          <pre><code data-trim class='cpp'>
+          <div class='fragment'>
+            <pre><code data-trim class='cpp'>
 for (auto point: m_homogeneous_coords)
   std::cout &lt;&lt; model.prob(point);
-          </code></pre>
-
-          <div style='text-align: left;'>
-            Caveat: For const-correctness and good practice,
+            </code></pre>
           </div>
-          <pre><code data-trim class='cpp'>
+
+          <div class='fragment'>
+            <div style='text-align: left;'>
+              Caveat: For const-correctness and good practice,
+            </div>
+            <pre><code data-trim class='cpp'>
 for (const auto&amp; point: m_homogeneous_coords)
   std::cout &lt;&lt; model.prob(point);
-          </code></pre>
-          <div style='text-align: left;'>
-            is the best solution. Please note that if you <em>do</em> need the index, the <code>auto</code> way does not work.
+            </code></pre>
+            <div style='text-align: left;'>
+              is the best solution. Please note that if you <em>do</em> need the index, the <code>auto</code> way does not work.
+            </div>
           </div>
         </section>
 
@@ -335,21 +354,24 @@ for (const auto&amp; point: m_homogeneous_coords)
         <section>
           <h3> Boost incarnate: Smart pointers </h3>
           <div style='text-align: left;'>
-            Arguably one of Boost’s most well-known features, <em>smart pointers</em> make safe memory management trivial. Instead of
-            <pre><code data-trim class='cpp'>
+            Arguably one of Boost’s most well-known features, <em>smart pointers</em> make safe memory management trivial. <span class='fragment' data-fragment-index='1'>Instead of</span>
+            <div class='fragment' data-fragment-index='1'>
+              <pre><code data-trim class='cpp'>
 std::vector&lt;myClass*&gt; vec;
 myClass* instance = new myClass(...);
 vec.push_back(instance);
-            </code></pre>
-            we can include the <code>&lt;memory&gt;</code> header and write
-            <pre><code data-trim class='cpp'>
+              </code></pre>
+            </div>
+            <div class='fragment' data-fragment-index='2'>
+              we can include the <code>&lt;memory&gt;</code> header and write
+              <pre><code data-trim class='cpp'>
 std::vector&lt;std::unique_ptr&lt;myClass&gt; &gt; vec;
 vec.push_back(std::unique_ptr&lt;myClass&gt;(new myClass(...));
-            </code></pre>
-            and when <code>vec</code> is destroyed, all of its elements are automatically and safely destroyed as well.
-            <br/>
-            <br/>
-            <small>Side note: This code makes implicit use of the new <em>move semantics</em>. This tutorial does not cover them, but they are supremely worthy of your time and a great addition to the standard.</small>
+              </code></pre>
+            </div>
+            <div class='fragment' data-fragment-index='3'>
+              and when <code>vec</code> is destroyed, all of its elements are automatically and safely destroyed as well.
+            </div>
           </div>
         </section>
 
@@ -364,11 +386,15 @@ std::shared_ptr&lt;myClass&gt; myClass_ptr{0};
 myClass_ptr = std::make_shared&lt;myClass&gt;(...);
 vec.push_back(myClass_ptr);
             </code></pre>
-            Smart pointers can still be dereferenced using <code>*</code> and <code>-&gt;</code>, as well as checked for not-null using 
-            <pre><code data-trim class='cpp'>
+            <div class='fragment'>
+              Smart pointers can still be dereferenced using <code>*</code> and <code>-&gt;</code>, as well as checked for not-null using 
+              <pre><code data-trim class='cpp'>
 if (myClass_ptr) {...}
-            </code></pre>
-            A <code>unique_ptr</code> has virtually no overhead; a <code>shared_ptr</code> has some due to e.g. reference counting (<code>weak_ptr</code> can help).
+              </code></pre>
+            </div>
+            <div class='fragment'>
+              A <code>unique_ptr</code> has virtually no overhead; a <code>shared_ptr</code> has some due to e.g. reference counting (<code>weak_ptr</code> can help).
+            </div>
           </div>
         </section>
 
@@ -380,15 +406,17 @@ if (myClass_ptr) {...}
             <pre><code data-trim class='cpp'>
 std::shared_ptr&lt;myClass&gt; myClass_ptr{0};
             </code></pre>
-            then you are right. The correct way to write this used to be
-            <pre><code data-trim class='cpp'>
+            then you are right. <span class='fragment' data-fragment-index='1'>The correct way to write this used to be</span>
+            <div class='fragment' data-fragment-index='1'>
+              <pre><code data-trim class='cpp'>
 std::shared_ptr&lt;myClass&gt; myClass_ptr = 0;
-            </code></pre>
-            or
-            <pre><code data-trim class='cpp'>
+              </code></pre>
+              or
+              <pre><code data-trim class='cpp'>
 std::shared_ptr&lt;myClass&gt; myClass_ptr = {0};
-            </code></pre>
-            which uses C++’s <em>aggregate initialization</em> syntax. However, in C++11 the first version is correct and preferred. It is an example of the new <em>uniform initialization syntax</em>.
+              </code></pre>
+            </div>
+            <span class='fragment' data-fragment-index='1'>which uses C++’s <em>aggregate initialization</em> syntax.</span> <span class='fragment' data-fragment-index='2'>However, in C++11 the first version is correct and preferred. It is an example of the new <em>uniform initialization syntax</em>.</span>
           </div>
         </section>
 
@@ -403,17 +431,23 @@ void Func() {
   int foo(myClass());
 }
             </code></pre>
-            What is <code>foo</code>?
+            <div class='fragment'>
+              What is <code>foo</code>?
+            </div>
             <ul>
-              <li> An <code>int</code> variable </li>
-              <li> A prototype for a function that takes a <code>myClass</code> and returns an <code>int</code> </li>
-              <li> A prototype for a function that takes a function that returns a <code>myClass</code>, and returns an <code>int</code> </li>
-              <li> Undefined behaviour </li>
+              <li class='fragment'> An <code>int</code> variable </li>
+              <li class='fragment'> A prototype for a function that takes a <code>myClass</code> and returns an <code>int</code> </li>
+              <li class='fragment'> A prototype for a function that takes a function that returns a <code>myClass</code>, and returns an <code>int</code> </li>
+              <li class='fragment'> Undefined behaviour </li>
             </ul>
-            This is the dreaded <b>Most Vexing Parse</b> or MVP. <br/>
-          <img style='position: absolute; right: 0px; top: 50px;' height='300' 
-               src='./assets/img/jesuschristhowhorrifying.png'
-               /><br/>
+            <div class='fragment'>
+              <img style='position: absolute; right: 0px; top: 50px;' height='300' 
+                   src='./assets/img/jesuschristhowhorrifying.png'
+                   /><br/>
+            </div>
+            <div class='fragment'>
+              This is the dreaded <b>Most Vexing Parse</b> or MVP. <br/>
+            </div>
           </div>
         </section>
 
@@ -429,11 +463,13 @@ void Func() {
   int foo{myClass{}};
 }
             </code></pre>
-            Now <code>foo</code> can only be a variable of type <code>int</code>. This is almost universally preferrable to legacy style. The only real restriction is that <em>narrowing</em> is no longer allowed:
-            <pre><code data-trim class='cpp'>
-int a(5.2);  // ok, a==5
-int a{5.2};  // error!
-            </code></pre>
+            <div class='fragment'>
+              Now <code>foo</code> can only be a variable of type <code>int</code>. This is almost universally preferrable to legacy style. The only real restriction is that <em>narrowing</em> is no longer allowed:
+              <pre><code data-trim class='cpp'>
+  int a(5.2);  // ok, a==5
+  int a{5.2};  // error!
+              </code></pre>
+            </div>
           </div>
         </section>
 
@@ -441,11 +477,14 @@ int a{5.2};  // error!
         <section>
           <h3> Lambda </h3>
           <div style='text-align: left'>
-            The functional programmer’s most favourite greek letter, &lambda; stands for anonymous functions. Their C++11 syntax seems strange at first and allows for esoteric code:
-            <pre><code data-trim class='cpp'>
-[](){}();
-            </code></pre>
-            is an in-place definition and immediate call of an anonymous <code>void</code> function which takes no parameters and does nothing. It is also completely legal.           
+            The functional programmer’s most favourite greek letter, &lambda; stands for anonymous functions. 
+            <span class='fragment' data-fragment-index='1'>Their C++11 syntax seems strange at first and allows for esoteric code:</span>
+            <div class='fragment' data-fragment-index='1'>
+              <pre><code data-trim class='cpp'>
+                [](){}();
+              </code></pre>
+            </div>
+            <span class='fragment' data-fragment-index='2'>is an in-place definition and immediate call of an anonymous <code>void</code> function which takes no parameters and does nothing. It is also completely legal.</span>
           </div>
         </section>
 
@@ -461,16 +500,18 @@ auto multiplier = [&amp;numbers](float factor) -&gt; void {
 };
 multiplier(3.0f);
             </code></pre>
-            <code>multiplier</code> is a function. It 
+            <div class='fragment'>
+              <code>multiplier</code> is a function. It 
+            </div>
             <ul>
-              <li> captures the local variable <code>numbers</code> by reference, </li>
-              <li> takes a <code>float</code> argument <code>factor</code>, </li>
-              <li> returns <code>void</code> (remember trailing return?), </li>
-              <li> and multiplies each element in <code>numbers</code> by <code>factor</code>. </li>
+              <li class='fragment'> captures the variable <code>numbers</code> by reference, </li>
+              <li class='fragment'> takes a <code>float</code> argument <code>factor</code>, </li>
+              <li class='fragment'> returns <code>void</code> (remember trailing return?), </li>
+              <li class='fragment'> and multiplies each element in <code>numbers</code> by <code>factor</code>. </li>
             </ul>
-            <br/>
-            <br/>
-            Note the use of <code>auto</code> which makes this very easy.
+            <div class='fragment'>
+              Note that <code>auto</code> is necessary here because the type of a lambda function is complicated and inferred at compile time.
+            </div>
             <br/>
           </div>
         </section>
@@ -479,20 +520,24 @@ multiplier(3.0f);
         <section>
           <h3> Multiple return values </h3>
           <div style='text-align: left'>
-          Python:
-            <pre><code data-trim class='python'>
+            <div class='fragment' data-fragment-index='1'>
+              Python:
+              <pre><code data-trim class='python'>
 def argmin(sequence):
   min_index = ...
   min_value = ...
   return [min_index, min_value]
 
 mini, minv = argmin(v)
-            </code></pre>
-          C++:
+              </code></pre>
+            </div>
+            <div class='fragment' data-fragment-index='2'>
+              C++:
+            </div>
           </div>
           <table>
             <tr>
-              <td width='auto'>
+              <td width='auto' class='fragment' data-fragment-index='2'>
             <pre><code data-trim class='cpp'>
 template &lt;typename T&gt;
 int argmin(std::vector&lt;T&gt;&amp; v, 
@@ -504,7 +549,7 @@ int argmin(std::vector&lt;T&gt;&amp; v,
 }
             </code></pre>
               </td>
-              <td width='auto'>
+              <td width='auto' class='fragment' data-fragment-index='3'>
             <pre><code data-trim class='cpp'>
 template &lt;typename T&gt;
 void argmin(std::vector&lt;T&gt;&amp; v, 
@@ -525,7 +570,8 @@ void argmin(std::vector&lt;T&gt;&amp; v,
           <h3> Multiple return values (cont.) </h3>
           <div style='text-align: left'>
             C++11:
-            <pre><code data-trim class='cpp'>
+            <div class='fragment'>
+              <pre><code data-trim class='cpp'>
 template &lt;typename T&gt;
 std::tuple&lt;int, T&gt; argmin(std::vector&lt;T&gt;&amp; v) 
 {
@@ -538,11 +584,15 @@ std::tuple&lt;int, T&gt; argmin(std::vector&lt;T&gt;&amp; v)
 int mini;
 float minv;
 std::tie(mini, minv) = argmin(numbers);
-            </code></pre>
-            <code>std::tuple</code> can take arbitrarily many elements and types. If you do not care about some of the return values...
-            <pre><code data-trim class='cpp'>
+              </code></pre>
+            </div>
+            <span class='fragment'><code>std::tuple</code> can take arbitrarily many elements and types.</span> <br/>
+            <span class='fragment'> If you do not care about some of the return values...</span>
+            <div class='fragment'>
+              <pre><code data-trim class='cpp'>
 std::tie(mini, std::ignore) = argmin(numbers);
-            </code></pre>
+              </code></pre>
+            </div>
           </div>
         </section>
 
@@ -655,38 +705,50 @@ bool val = check(make());
   std::cout &lt;&lt; "Compiled using C++03 or earlier\n";
 #endif
             </code></pre>
-            Standard values are <code>199711L</code> (C++98/C++03), <code>201103L</code> (C++11) and <code>201402L</code> (C++14).
-            <br/>
-            Some compilers only support specific features, so it may be wiser to check for e.g.
-            <pre><code data-trim class='cpp'>
+            <div class='fragment'>
+              Standard values for <code>__cplusplus</code> are <code>199711L</code> (C++98/C++03 aka "C++"), <code>201103L</code> (C++11) and <code>201402L</code> (C++14).
+            </div>
+            <div class='fragment'>
+              Some compilers only support specific features, so it may be wiser to check for e.g.
+              <pre><code data-trim class='cpp'>
 #ifdef HAS_MOVE_SEMANTICS
-            </code></pre>
+              </code></pre>
+            </div>
           </div>
         </section>
 
 
         <section>
-          <h3> Sweating the small stuff </h3>
+          <h3> Pop Quiz </h3>
           <div style='text-align: left'>
-            <p> Pop quiz: What is wrong with this line? </p>
             <pre><code data-trim class='cpp'>
               std::vector&lt;std::vector&lt;int&gt;&gt; vec;
             </code></pre>
+            <span class='fragment' data-fragment-index='1'> What is wrong with this line? </span> 
+            <span class='fragment' data-fragment-index='2'> GCC says: </span>
+            <div class='fragment' data-fragment-index='2'>
+              <pre><code data-trim class='cpp'>
+                error: '&gt;&gt;' should be '&gt; &gt;' within a nested template argument list 
+              </code></pre>
+            </div>
 
-            <p> GCC says: </p>
-            <pre><code data-trim class='cpp'>
-              error: '&gt;&gt;' should be '&gt; &gt;' within a nested template argument list 
-            </code></pre>
-
-            <p> Remedy: </p>
-            <pre><code data-trim class='cpp'>
-              std::vector&lt;std::vector&lt;int&gt; &gt; vec;
-            </code></pre>
-            <img style='position: absolute; right: 0px; top: 150px;' height='300' 
+            <div class='fragment' data-fragment-index='3'>
+              Remedy:
+              <pre><code data-trim class='cpp'>
+                std::vector&lt;std::vector&lt;int&gt; &gt; vec;
+              </code></pre>
+            </div>
+            <div class='fragment' data-fragment-index='5'>
+              C++11: Both versions are equivalent. <br/>
+            </div>
+            <div class='fragment' data-fragment-index='6'>
+              Homework assignment: Incorporate this into our code.
+            </div>
+          </div>
+          <div class='fragment' data-fragment-index='4'>
+            <img style='position: absolute; right: 0px; top: 100px;' height='300' 
                  src='./assets/img/misc-are-you-fucking-kidding-me.jpg'
-                 /><br/>
-             C++11: Both versions are equivalent. <br/>
-             Homework assignment: Incorporate this into our code.
+                 />
           </div>
         </section>
 
