@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang='en'>
+
+  <head>
+    <meta charset='utf-8'>
+
+    <title> Tutorial: C++11 </title>
+
+    <meta name='description' content='Hands-on tutorial and presentation on C++11'>
+    <meta name='author' content='Nikolaus Mayer'>
+
+    <meta name='apple-mobile-web-app-capable' content='yes' />
+    <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui'>
+
+    <link rel='stylesheet' href='css/reveal.css'>
+    <link rel='stylesheet' href='css/theme/white.css' id='theme'>
+
+    <!-- Code syntax highlighting -->
+    <link rel='stylesheet' href='lib/css/solarized_light.css'>
+
+
+    <!--[if lt IE 9]>
+    <script src='lib/js/html5shiv.js'></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class='reveal'>
+
+      <div class='slides'>
+        <!-- Any section element inside of this container is displayed as a slide -->
+
+
+
+
+
+
+
+
+
+
+
+
+        <section>
+          <h3> Preparation </h3>
+          <div style='text-align: left;'>
+            <p>
+              In this tutorial, we will transform a short program from legacy C++ into C++11, and learn a few of the new features along the way.
+            </p>
+            <p> 
+              The tutorial is designed for you to follow along hands-on: We will alternate between meeting a feature and integrating it into our code. If you want to get your hands dirty, the presentation slides and code samples are available on 
+            </p>
+            <pre ><code data-trim class='bash'>
+              git clone https://github.com/nikolausmayer/cpp11presentation
+            </code></pre>
+            <p> 
+            (please use GCC/g++ &ge; 4.7) but you are not <em>required</em> to do so.
+            </p>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Disclaimer </h3>
+          <div style='text-align: left;'>
+            <p> I am not an expert in C++(11). I may or may not be able to answer technical questions. </p>
+            <p> The code examples are designed to highlight specific language features, and may not always represent best code practices or sensible program design. </p>
+            <p> If you are using Boost, you may already know much of what follows. </p>
+          </div>
+        </section>
+
+
+        <section>
+          <h1> C++11 </h1>
+          <br/>
+          <h3> A superficial, cherry-picking hands-on introduction not as scary as it sounds </h3>
+          <br/>
+          <small> Nikolaus Mayer </small>
+        </section>
+
+
+        <section>
+          <h3> Overview </h3>
+          <div style='text-align: left;'>
+            <ul>
+              <li> What is C++11? </li>
+              <li> <code>auto</code> </li>
+              <li> Range <code>for</code> loops </li>
+              <li> Smart pointers </li>
+              <li> Uniform initialization syntax </li>
+              <li> &lambda; </li>
+              <li> Multiple return values </li>
+              <li> Miscellaneous </li>
+            </ul>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> What is C++11 ... </h3>
+          <div style='text-align: left;'>
+            <ul>
+              <li> C++11 is a C++ standard specification published in 2011 </li>
+              <li> It replaces C++03 and is itself replaced by C++14 / C++17 </li>
+              <li> C++11 adds to the core language and the Standard Library </li>
+            </ul>
+          </div>
+          <img src='./assets/img/isocpp_timeline.png'
+               /><br/>
+        </section>
+
+
+        <section>
+          <h3> What is C++11 ... </h3>
+          <div style='text-align: left;'>
+            <ul>
+              <li> C++11 is a C++ standard specification published in 2011 </li>
+              <li> It replaces C++03 and is itself replaced by C++14 / C++17 </li>
+              <li> C++11 adds to the core language and the Standard Library </li>
+            </ul>
+          </div>
+          <h4> ... how do I use it ... </h4>
+          <div style='text-align: left;'>
+            <ul>
+              <li> Use GCC 4.7 or later for best results (or Clang) </li>
+              <li> Compile with <code>-std=c++11</code> (<code>-std=c++0x</code> for GCC &le; 4.6) </li>
+            </ul>
+          </div>
+          <h4> ... and why <em>should</em> I? </h4>
+          <div style='text-align: left;'>
+            <ul>
+              <li> We'll get to that </li>
+              <li> You don't lose anything (few exotic breaking changes*) </li>
+            </ul>
+            <br/>
+            <br/>
+            <small>*) <a href='http://stackoverflow.com/a/6402166'>http://stackoverflow.com/a/6402166</a> </small>
+          </div>
+        </section>
+
+        <section>
+          <h3> Hands-On </h3>
+          <div style='text-align: left;'>
+            <ol>
+              <li> Make sure you have at least g++-4.7, and if not: <br/> 
+                   <code>sudo apt-get install g++-4.9 gcc-4.9</codE> </LI>
+              <li> If you didn't do it earlier, get the materials:<br/>
+                   <code style='font-size: 0.6em'>git clone https://github.com/nikolausmayer/cpp11presentation</code> </li>
+              <li> In your favourite editor, open the Makefile in the repository’s code folder <code>code/Makefile</code> </li>
+              <li> Add <code>-std=c++11</code> to <code>CXXFLAGS</code> </li>
+              <li> <code>make</code> to make sure it works. If you had to install a new g++, you might want to use <code>CXX=g++-4.9 make</code> </li>
+            </ol>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> The elephant in the room: <code style='text-transform: none;'>auto</code> </h3>
+          <div style='text-align: left;'>
+            <ul>
+              <li>The <code>auto</code> <em>keyword</em> is not new, but its meaning has changed </li>
+              <li>Before: Storage class specifier (cf. <code>static</code>, <code>extern</code>) </li>
+              <li>Now: Automatic type deduction:
+                <pre><code data-trim class='cpp'>
+float almostpi = 3.14f;
+std::vector&lt;SomeClass&lt;SomeType&gt; &gt;::iterator it = myvec.begin();
+                </code></pre>
+                can become
+                <pre><code data-trim class='cpp'>
+auto almostpi = 3.14f;
+auto it = myvec.begin();
+                </code></pre>
+              </li>
+              <li> Type deduction happens at compile time </li>
+              <li> Important: In general, <code>auto</code> ignores references and <code>const</code>/<code>volatile</code> (there are special cases) </li>
+            </ul>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Return type deduction: <code style='text-transform: none;'>auto</code>, <code style='text-transform: none;'>decltype</code> </h3>
+          <pre><code data-trim class='cpp'>
+template &lt;typename T1, typename T2&gt;
+auto add(T1 t1, T2 t2) {
+  return t1 + t2;
+}
+auto v = add(2, 3.14);
+          </code></pre>
+          <div style='text-align: left;'>
+            does not work. But with a <em>trailing return type</em>, it can:
+          </div>
+          <pre><code data-trim class='cpp'>
+template &lt;typename T1, typename T2&gt;
+auto add(T1 t1, T2 t2) -&gt; decltype(t1 + t2) {
+  return t1 + t2;
+}
+auto v = add(2, 3.14);
+          </code></pre>
+        </section>
+
+
+        <section>
+          <h3> “Trailing” return type? </h3>
+          <div style='text-align: left;'>
+            <code>decltype</code> can do anything that <code>auto</code> can. Why not write...
+            <pre><code data-trim class='cpp'>
+template &lt;typename T1, typename T2&gt;
+decltype(t1 + t2) add(T1 t1, T2 t2) {     // (a)
+  return t1 + t2;
+}
+decltype(add(2, 3.14)) v = add(2, 3.14);  // (b)
+            </code></pre>
+            <ul>
+              <li> (a) <code>t1</code> and <code>t2</code> are technically unknown at that point </li>
+              <li> (b) This is just cumbersome </li>
+            </ul>
+            <br/>
+            <br/>
+
+            C++14 (<code>-std=c++1y</code> in GCC 4.8, <code>-std=c++14</code> in GCC&ge;4.9):
+            <pre><code data-trim class='cpp'>
+template &lt;typename T1, typename T2&gt;
+auto add(T1 t1, T2 t2) {
+  return t1 + t2;
+}
+            </code></pre>
+            <small> *) <a href='http://thbecker.net/articles/auto_and_decltype/section_01.html'> http://thbecker.net/articles/auto_and_decltype/section_01.html </a> </small>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> With great power </h3>
+          <pre><code data-trim class='cpp'>
+int i = 5;
+ProbabilityModel obj = m[i];
+std::pair&lt;int,int&gt; p = m_hocos[0];
+std::cout &lt;&lt; obj.prob(p);
+          </code></pre>
+          <h3> comes great responsibility</h3>
+          <table>
+            <tr>
+              <td>
+          <pre><code data-trim class='cpp'>
+auto i = 5;
+auto obj = m[i];
+auto p = m_hocos[0];
+std::cout &lt;&lt; obj.prob(p);
+          </code></pre>
+              </td>
+              <td width='auto'>
+          <pre><code data-trim class='cpp'>
+int idx = 5;
+auto model = prob_models[idx];
+auto point = m_homogeneous_coords[0];
+std::cout &lt;&lt; model.prob(point);
+          </code></pre>
+              </td>
+            </tr>
+          </table>
+          <div style='text-align: left;'>
+            <code>auto</code> is a double-edged sword. If you let it loose, it will destroy your code. Use it wisely, and keep in mind: Either declaration or handle must be informative.
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Range-for loops </h3>
+          <div style='text-align: left;'>
+            This is nice:
+          </div>
+          <pre><code data-trim class='cpp'>
+auto point = m_homogeneous_coords[0];
+std::cout &lt;&lt; model.prob(point);
+          </code></pre>
+
+          <div style='text-align: left;'>
+            But in our code, we iterate over all entries:
+          </div>
+          <pre><code data-trim class='cpp'>
+for (unsigned int i = 0; i &lt; m_homogeneous_coords.size(); ++i)
+  std::cout &lt;&lt; model.prob(m_homogeneous_coords[i]);
+          </code></pre>
+
+          <div style='text-align: left;'>
+            This is boilerplate because we do not actually care about <code>i</code>. The “good” solution (which also works for e.g. <code>std::map</code>) is far, far worse still:
+          </div>
+
+          <pre><code data-trim class='cpp'>
+for (std::vector&lt;std::pair&lt;int,int&gt; &gt;::iterator it = m_...begin();
+     it != m_homogeneous_coords.end();
+     ++it)
+  std::cout &lt;&lt; model.prob(*it);
+          </code></pre>
+        </section>
+
+
+        <section>
+          <h3> Range-for loops (cont.) </h3>
+
+          <div style='text-align: left;'>
+            In Python, we could simply write
+          </div>
+
+          <pre><code data-trim class='python'>
+for point in m_homogeneous_coords:
+  print(point)
+          </code></pre>
+
+          <div style='text-align: left;'>
+            which is infinitely more intuitive. Luckily, with C++11 the following is not only legal, but preferred:
+          </div>
+          <pre><code data-trim class='cpp'>
+for (auto point: m_homogeneous_coords)
+  std::cout &lt;&lt; model.prob(point);
+          </code></pre>
+
+          <div style='text-align: left;'>
+            Caveat: For const-correctness and good practice,
+          </div>
+          <pre><code data-trim class='cpp'>
+for (const auto&amp; point: m_homogeneous_coords)
+  std::cout &lt;&lt; model.prob(point);
+          </code></pre>
+          <div style='text-align: left;'>
+            is the best solution. Please note that if you <em>do</em> need the index, the <code>auto</code> way does not work.
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Boost incarnate: Smart pointers </h3>
+          <div style='text-align: left;'>
+            Arguably one of Boost’s most well-known features, <em>smart pointers</em> make safe memory management trivial. Instead of
+            <pre><code data-trim class='cpp'>
+std::vector&lt;myClass*&gt; vec;
+myClass* instance = new myClass(...);
+vec.push_back(instance);
+            </code></pre>
+            we can include the <code>&lt;memory&gt;</code> header and write
+            <pre><code data-trim class='cpp'>
+std::vector&lt;std::unique_ptr&lt;myClass&gt; &gt; vec;
+vec.push_back(std::unique_ptr&lt;myClass&gt;(new myClass(...));
+            </code></pre>
+            and when <code>vec</code> is destroyed, all of its elements are automatically and safely destroyed as well.
+            <br/>
+            <br/>
+            <small>Side note: This code makes implicit use of the new <em>move semantics</em>. This tutorial does not cover them, but they are supremely worthy of your time and a great addition to the standard.</small>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Boost incarnate: Smart pointers (con.) </h3>
+          <div style='text-align: left;'>
+            The <code>unique_ptr</code> is useful if an instance is never shared and never copied. To get the full functionality of naked pointers (e.g. copyability), use <code>shared_ptr</code> instead.
+            <pre><code data-trim class='cpp'>
+std::vector&lt;std::shared_ptr&lt;myClass&gt; &gt; vec;
+std::shared_ptr&lt;myClass&gt; myClass_ptr{0};
+myClass_ptr = std::make_shared&lt;myClass&gt;(...);
+vec.push_back(myClass_ptr);
+            </code></pre>
+            Smart pointers can still be dereferenced using <code>*</code> and <code>-&gt;</code>, as well as checked for not-null using 
+            <pre><code data-trim class='cpp'>
+if (myClass_ptr) {...}
+            </code></pre>
+            A <code>unique_ptr</code> has virtually no overhead; a <code>shared_ptr</code> has some due to e.g. reference counting (<code>weak_ptr</code> can help).
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Uniform initialization syntax </h3>
+          <div style='text-align: left;'>
+            If this line struck you as odd
+            <pre><code data-trim class='cpp'>
+std::shared_ptr&lt;myClass&gt; myClass_ptr{0};
+            </code></pre>
+            then you are right. The correct way to write this used to be
+            <pre><code data-trim class='cpp'>
+std::shared_ptr&lt;myClass&gt; myClass_ptr = 0;
+            </code></pre>
+            or
+            <pre><code data-trim class='cpp'>
+std::shared_ptr&lt;myClass&gt; myClass_ptr = {0};
+            </code></pre>
+            which uses C++’s <em>aggregate initialization</em> syntax. However, in C++11 the first version is correct and preferred. It is an example of the new <em>uniform initialization syntax</em>.
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Pop quiz </h3>
+          <div style='text-align: left;'>
+            <pre><code data-trim class='cpp'>
+class myClass;
+
+void Func() {
+  int foo(myClass());
+}
+            </code></pre>
+            What is <code>foo</code>?
+            <ul>
+              <li> An <code>int</code> variable </li>
+              <li> A prototype for a function that takes a <code>myClass</code> and returns an <code>int</code> </li>
+              <li> A prototype for a function that takes a function that returns a <code>myClass</code>, and returns an <code>int</code> </li>
+              <li> Undefined behaviour </li>
+            </ul>
+            This is the dreaded <b>Most Vexing Parse</b> or MVP. <br/>
+          <img style='position: absolute; right: 0px; top: 50px;' height='300' 
+               src='./assets/img/jesuschristhowhorrifying.png'
+               /><br/>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Uniform initialization syntax (cont.) </h3>
+          <div style='text-align: left;'>
+            C++11’s uniform initialization syntax solves this.
+            <pre><code data-trim class='cpp'>
+class myClass;
+
+void Func() {
+  int foo{myClass{}};
+}
+            </code></pre>
+            Now <code>foo</code> can only be a variable of type <code>int</code>. This is almost universally preferrable to legacy style. The only real restriction is that <em>narrowing</em> is no longer allowed:
+            <pre><code data-trim class='cpp'>
+int a(5.2);  // ok, a==5
+int a{5.2};  // error!
+            </code></pre>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Lambda </h3>
+          <div style='text-align: left'>
+            The functional programmer’s most favourite greek letter, &lambda; stands for anonymous functions. Their C++11 syntax seems strange at first and allows for esoteric code:
+            <pre><code data-trim class='cpp'>
+[](){}();
+            </code></pre>
+            is an in-place definition and immediate call of an anonymous <code>void</code> function which takes no parameters and does nothing. It is also completely legal.           
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Lambda (cont.) </h3>
+          <div style='text-align: left'>
+            A (slightly) better example:
+            <pre><code data-trim class='cpp'>
+std::vector&lt;float&gt; numbers{...};
+auto multiplier = [&amp;numbers](float factor) -&gt; void {
+  for (auto&amp; elem: numbers) elem *= factor;
+};
+multiplier(3.0f);
+            </code></pre>
+            <code>multiplier</code> is a function. It 
+            <ul>
+              <li> captures the local variable <code>numbers</code> by reference, </li>
+              <li> takes a <code>float</code> argument <code>factor</code>, </li>
+              <li> returns <code>void</code> (remember trailing return?), </li>
+              <li> and multiplies each element in <code>numbers</code> by <code>factor</code>. </li>
+            </ul>
+            <br/>
+            <br/>
+            Note the use of <code>auto</code> which makes this very easy.
+            <br/>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Multiple return values </h3>
+          <div style='text-align: left'>
+          Python:
+            <pre><code data-trim class='python'>
+def argmin(sequence):
+  min_index = ...
+  min_value = ...
+  return [min_index, min_value]
+
+mini, minv = argmin(v)
+            </code></pre>
+          C++:
+          </div>
+          <table>
+            <tr>
+              <td width='auto'>
+            <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+int argmin(std::vector&lt;T&gt;&amp; v, 
+           T&amp; min_value) 
+{
+  int min_index = {...}
+  min_value = {...}
+  return min_index;
+}
+            </code></pre>
+              </td>
+              <td width='auto'>
+            <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+void argmin(std::vector&lt;T&gt;&amp; v, 
+            int&amp; min_index,
+            T&amp; min_value) 
+{
+  min_index = {...}
+  min_value = {...}
+}
+            </code></pre>
+              </td>
+            </tr>
+          </table>
+        </section>
+
+
+        <section>
+          <h3> Multiple return values (cont.) </h3>
+          <div style='text-align: left'>
+            C++11:
+            <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+std::tuple&lt;int, T&gt; argmin(std::vector&lt;T&gt;&amp; v) 
+{
+  int min_index = {...}
+  T min_value = {...}
+  return std::make_tuple(min_index, min_value);
+}
+
+...
+int mini;
+float minv;
+std::tie(mini, minv) = argmin(numbers);
+            </code></pre>
+            <code>std::tuple</code> can take arbitrarily many elements and types. If you do not care about some of the return values...
+            <pre><code data-trim class='cpp'>
+std::tie(mini, std::ignore) = argmin(numbers);
+            </code></pre>
+          </div>
+        </section>
+
+
+
+
+
+
+
+        <!--<section>
+          <h3> Sweating the small stuff: <br/>
+               Rvalue references </h3>
+          <div style='text-align: left'>
+            What is wrong with this code?
+            <pre><code data-trim class='cpp'>
+bool check (const myClass&amp; instance) {
+  return (instance.i == 1);
+}
+
+...
+
+bool val = check(myClass());
+            </code></pre>
+            <pre><code data-trim class='bash' style='font-size: 0.7em;'>
+invalid initialization of non-const reference of type ‘myClass&amp;’ from an rvalue of type ‘myClass’
+  bool val = check(make());
+in passing argument 1 of ‘bool check(const myClass&amp;)’
+  bool check (mstruct&amp; instance)
+            </code></pre>
+          </div>
+
+          <img style='position: absolute; right: 0px; bottom: 100px;' height='300' 
+               src='./assets/img/jesuschristhowhorrifying.png'
+               /><br/>
+        </section>
+
+
+        <section>
+          <h3> Rvalue references (cont.) </h3>
+          <div style='text-align: left'>
+            <pre><code data-trim class='cpp'>
+bool check (mstruct&amp; instance) {
+            </code></pre>
+            cannot capture the result of 
+            <pre><code data-trim class='cpp'>
+make_mstruct()
+            </code></pre>
+            because it expects a mutable <em>lvalue</em>, but the latter is an <em>rvalue</em> and thus taken to be immutable.
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Rvalue references (cont.) </h3>
+          <div style='text-align: left'>
+            Option 1:
+            <pre><code data-trim class='cpp'>
+struct mstruct { int i; };
+
+mstruct make() { 
+  return mstruct{1}; 
+}
+
+bool check (const mstruct&amp; instance) {
+  return (instance.i == 1);
+}
+
+...
+mstruct tmp = make();
+bool val = check(tmp);
+            </code></pre>
+            Now <code>tmp</code> is an <em>lvalue</em>, but code readability suffers.
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Rvalue references (cont.) </h3>
+          <div style='text-align: left'>
+            Option 2:
+            <pre><code data-trim class='cpp'>
+struct mstruct { int i; };
+
+mstruct make() { 
+  return mstruct{1}; 
+}
+
+bool check (const mstruct&amp; instance) {
+  return (instance.i == 1);
+}
+bool check (mstruct&amp;&amp; instance) {
+  return check(instance);
+}
+
+...
+bool val = check(make());
+            </code></pre>
+          </div>
+        </section>-->
+
+
+        <section>
+          <h3> Checking for C++11 </h3>
+          <div style='text-align: left'>
+            In our code, you will find
+            <pre><code data-trim class='cpp'>
+#if __cplusplus > 199711L
+  std::cout &lt;&lt; "Compiled using C++11 or later\n";
+#else
+  std::cout &lt;&lt; "Compiled using C++03 or earlier\n";
+#endif
+            </code></pre>
+            Standard values are <code>199711L</code> (C++98/C++03), <code>201103L</code> (C++11) and <code>201402L</code> (C++14).
+            <br/>
+            Some compilers only support specific features, so it may be wiser to check for e.g.
+            <pre><code data-trim class='cpp'>
+#ifdef HAS_MOVE_SEMANTICS
+            </code></pre>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Sweating the small stuff </h3>
+          <div style='text-align: left'>
+            <p> Pop quiz: What is wrong with this line? </p>
+            <pre><code data-trim class='cpp'>
+              std::vector&lt;std::vector&lt;int&gt;&gt; vec;
+            </code></pre>
+
+            <p> GCC says: </p>
+            <pre><code data-trim class='cpp'>
+              error: '&gt;&gt;' should be '&gt; &gt;' within a nested template argument list 
+            </code></pre>
+
+            <p> Remedy: </p>
+            <pre><code data-trim class='cpp'>
+              std::vector&lt;std::vector&lt;int&gt; &gt; vec;
+            </code></pre>
+            <img style='position: absolute; right: 0px; top: 150px;' height='300' 
+                 src='./assets/img/misc-are-you-fucking-kidding-me.jpg'
+                 /><br/>
+             C++11: Both versions are equivalent. <br/>
+             Homework assignment: Incorporate this into our code.
+          </div>
+        </section>
+
+
+        <!--<section>
+          <h3> Miscellaneous (cont.) </h3>
+          <div style='text-align: left'>
+            C++11 introduces <code>nullptr</code> as a better alternative to <code>NULL</code>/<code>0</code>.
+            Its type is <code>std::nullptr_t</code>, and it allows <em>overloads for null pointers</em>:
+          </div>
+          <pre><code data-trim class='cpp'>
+void f(int* iptr) { ... }
+void f(double* dptr) { ... }
+void f(std::nullptr_t nullp) { ... }
+
+int main () {
+  f(nullptr);  // would have been ambigious pre-c++11
+}
+          </code></pre>
+        </section>-->
+
+
+        <section>
+          <h3> Many more things </h3>
+          <div style='text-align: left'>
+            C++11 offers much more: <br/>
+            <code>decltype</code>, 
+            initializer lists, 
+            Constructors calling other constructors of the same class, 
+            <code>override</code> and <code>final</code> keywords, 
+            rvalue references, 
+            <code>[[noreturn]]</code> and other attributes, 
+            Variadic templates,  
+            <code>std::nullptr_t</code>, 
+            type traits, 
+            <code>std::thread</code>, 
+            <span style='font-size: 0.9em;'><code>std::promise</code>,</span> 
+            <span style='font-size: 0.8em;'><code>std::future</code>,</span> 
+            <span style='font-size: 0.7em;'><code>std::packaged_task</code>,</span> 
+            <span style='font-size: 0.6em;'><code>static_assert</code>,</span> 
+            <span style='font-size: 0.5em;'><code>std::chrono::steady_clock</code>,</span> 
+            <span style='font-size: 0.4em;'><code>class enum</code>, </span> 
+            <span style='font-size: 0.3em;'><code>std::I_hope_this_is_too_small_to_read</code>, ...</span> 
+            <br/>
+            <br/>
+
+            C++14 offers even more, but compiler support may be incomplete (Clang is leading). C++17 is not yet finalized. YouTube offers many great CppCon talks on this topic.
+          </div>
+        </section>
+
+
+        <section>
+          <div style='text-align: right;'>
+            <h1> THE END </h1>
+          </div>
+          <h3> Summary </h3>
+          <div style='text-align: left;'>
+            <ul>
+              <li> C++11 takes away much of the C++ grind </li>
+              <li> There is no hard reason not to use it </li>
+              <li> On a <em>remotely</em> up-to-date system, it’s just a keyword away </li>
+              <li> But please, think before you <code>auto</code> </li>
+            </ul>
+          </div>
+          <br/>
+          <br/>
+
+          <h3> Thank you for you attention! </h3>
+          <h3> Questions? </h3>
+        </section>
+
+
+
+
+
+
+        <section>
+          <div style='text-align: left;'>
+            <h3> Sources </h3>
+            <small>
+              <ul>
+                <li> stackoverflow.com, cppreference.com, en.wikipedia.org </li>
+                <li> https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/introduction_to_the_c_11_feature_trailing_return_types </li>
+                <li> http://www.codeproject.com/Articles/570638/Ten-Cplusplus-Features-Every-Cplusplus-Developer </li>
+                <li> http://thbecker.net/articles/auto_and_decltype/section_01.html </li>
+              </ul>
+              <br/>
+              <br/>
+
+              Images: <br/>
+              <ul>
+                <li> C++ timeline: isocpp.com </li>
+                <li> jesuschristhowhorrifying: horribleville.com </li>
+                <li> areyoufuckingkiddingme: knowyourmeme.com </li>
+              </ul>
+            </small>
+          </div>
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+
+    </div>
+
+    <script src='lib/js/head.min.js'></script>
+    <script src='js/reveal.js'></script>
+
+    <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: false,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: true,
+        overview: false,
+
+        transition: 'none', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+        ]
+      });
+
+    </script>
+
+  </body>
+</html>
