@@ -416,7 +416,8 @@ std::shared_ptr&lt;myClass&gt; myClass_ptr = 0;
 std::shared_ptr&lt;myClass&gt; myClass_ptr = {0};
               </code></pre>
             </div>
-            <span class='fragment' data-fragment-index='1'>which uses C++’s <em>aggregate initialization</em> syntax.</span> <span class='fragment' data-fragment-index='2'>However, in C++11 the first version is correct and preferred. It is an example of the new <em>uniform initialization syntax</em>.</span>
+            <span class='fragment' data-fragment-index='1'>which uses C++’s <em>aggregate initialization</em> syntax.<br/></span> 
+            <span class='fragment' data-fragment-index='2'>In C++11 the first version is correct and preferred. It is an example of the new <em>uniform initialization syntax</em>.</span>
           </div>
         </section>
 
@@ -466,8 +467,8 @@ void Func() {
             <div class='fragment'>
               Now <code>foo</code> can only be a variable of type <code>int</code>. This is almost universally preferrable to legacy style. The only real restriction is that <em>narrowing</em> is no longer allowed:
               <pre><code data-trim class='cpp'>
-  int a(5.2);  // ok, a==5
-  int a{5.2};  // error!
+int a(5.2);  // ok, a==5
+int a{5.2};  // error!
               </code></pre>
             </div>
           </div>
@@ -492,25 +493,28 @@ void Func() {
         <section>
           <h3> Lambda (cont.) </h3>
           <div style='text-align: left'>
-            A (slightly) better example:
+            <span style='font-size: 0.8em;'>"Lambda" stands for (anonymous) function objects.</span>
             <pre><code data-trim class='cpp'>
-std::vector&lt;float&gt; numbers{...};
-auto multiplier = [&amp;numbers](float factor) -&gt; void {
-  for (auto&amp; elem: numbers) elem *= factor;
-};
-multiplier(3.0f);
+int main() {
+  std::vector&lt;float&gt; numbers;
+  ...
+  auto multiplier = [&amp;numbers](float factor) -&gt; void {
+    for (auto&amp; elem: numbers) elem *= factor;
+  };
+  multiplier(3.0f);
+}
             </code></pre>
-            <div class='fragment'>
+            <div class='fragment' style='font-size: 0.8em;'>
               <code>multiplier</code> is a function. It 
             </div>
             <ul>
-              <li class='fragment'> captures the variable <code>numbers</code> by reference, </li>
-              <li class='fragment'> takes a <code>float</code> argument <code>factor</code>, </li>
-              <li class='fragment'> returns <code>void</code> (remember trailing return?), </li>
-              <li class='fragment'> and multiplies each element in <code>numbers</code> by <code>factor</code>. </li>
+              <li class='fragment' style='font-size: 0.8em;'> captures the variable <code>numbers</code> by reference, </li>
+              <li class='fragment' style='font-size: 0.8em;'> takes a <code>float</code> argument <code>factor</code>, </li>
+              <li class='fragment' style='font-size: 0.8em;'> returns <code>void</code> (remember trailing return?), </li>
+              <li class='fragment' style='font-size: 0.8em;'> and multiplies each element in <code>numbers</code> by <code>factor</code>. </li>
             </ul>
-            <div class='fragment'>
-              Note that <code>auto</code> is necessary here because the type of a lambda function is complicated and inferred at compile time.
+            <div class='fragment' style='font-size: 0.8em;'>
+              <code>auto</code> is necessary because the type of a lambda function is complicated and inferred at compile time.
             </div>
             <br/>
           </div>
@@ -727,7 +731,7 @@ bool val = check(make());
             <span class='fragment' data-fragment-index='1'> What is wrong with this line? </span> 
             <span class='fragment' data-fragment-index='2'> GCC says: </span>
             <div class='fragment' data-fragment-index='2'>
-              <pre><code data-trim class='cpp'>
+              <pre><code data-trim class='bash'>
                 error: '&gt;&gt;' should be '&gt; &gt;' within a nested template argument list 
               </code></pre>
             </div>
@@ -741,12 +745,9 @@ bool val = check(make());
             <div class='fragment' data-fragment-index='5'>
               C++11: Both versions are equivalent. <br/>
             </div>
-            <div class='fragment' data-fragment-index='6'>
-              Homework assignment: Incorporate this into our code.
-            </div>
           </div>
           <div class='fragment' data-fragment-index='4'>
-            <img style='position: absolute; right: 0px; top: 100px;' height='300' 
+            <img style='position: absolute; right: 0px; top: 80px;' height='300' 
                  src='./assets/img/misc-are-you-fucking-kidding-me.jpg'
                  />
           </div>
@@ -775,27 +776,27 @@ int main () {
           <h3> Many more things </h3>
           <div style='text-align: left'>
             C++11 offers much more: <br/>
-            <code>decltype</code>, 
-            initializer lists, 
-            Constructors calling other constructors of the same class, 
-            <code>override</code> and <code>final</code> keywords, 
-            rvalue references, 
-            <code>[[noreturn]]</code> and other attributes, 
-            Variadic templates,  
-            <code>std::nullptr_t</code>, 
-            type traits, 
-            <code>std::thread</code>, 
-            <span style='font-size: 0.9em;'><code>std::promise</code>,</span> 
-            <span style='font-size: 0.8em;'><code>std::future</code>,</span> 
-            <span style='font-size: 0.7em;'><code>std::packaged_task</code>,</span> 
-            <span style='font-size: 0.6em;'><code>static_assert</code>,</span> 
-            <span style='font-size: 0.5em;'><code>std::chrono::steady_clock</code>,</span> 
-            <span style='font-size: 0.4em;'><code>class enum</code>, </span> 
-            <span style='font-size: 0.3em;'><code>std::I_hope_this_is_too_small_to_read</code>, ...</span> 
+            <span class='fragment'><code>decltype</code>, </span>
+            <span class='fragment'>initializer lists, </span>
+            <span class='fragment'>Constructors calling other constructors of the same class,  </span>
+            <span class='fragment'><code>override</code> and <code>final</code> keywords,  </span>
+            <span class='fragment'>rvalue references,  </span>
+            <span class='fragment'><code>[[noreturn]]</code> and other attributes,  </span>
+            <span class='fragment'>Variadic templates,   </span>
+            <span class='fragment'><code>std::nullptr_t</code>,  </span>
+            <span class='fragment'>type traits,  </span>
+            <span class='fragment'><code>std::thread</code>,  </span>
+            <span class='fragment'><span style='font-size: 0.9em;'><code>std::promise</code>,</span>  </span>
+            <span class='fragment'><span style='font-size: 0.8em;'><code>std::future</code>,</span>  </span>
+            <span class='fragment'><span style='font-size: 0.7em;'><code>std::packaged_task</code>,</span>  </span>
+            <span class='fragment'><span style='font-size: 0.6em;'><code>static_assert</code>,</span>  </span>
+            <span class='fragment'><span style='font-size: 0.5em;'><code>std::chrono::steady_clock</code>,</span>  </span>
+            <span class='fragment'><span style='font-size: 0.4em;'><code>class enum</code>, </span>  </span>
+            <span class='fragment'><span style='font-size: 0.3em;'><code>std::I_hope_this_is_too_small_to_read</code>, ...</span>  </span>
             <br/>
             <br/>
 
-            C++14 offers even more, but compiler support may be incomplete (Clang is leading). C++17 is not yet finalized. YouTube offers many great CppCon talks on this topic.
+            <span class='fragment'>C++14 offers even more, but compiler support may be incomplete (Clang is leading). C++17 is not yet finalized. YouTube offers many great CppCon talks on this topic.</span>
           </div>
         </section>
 
