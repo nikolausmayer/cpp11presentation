@@ -39,8 +39,8 @@ body {
 .reveal .slides section .fragment {
   opacity: 0;
   visibility: hidden;
-  -webkit-transition: all 0.2s ease;
-          transition: all 0.2s ease; }
+  -webkit-transition: all 0.s ease;
+          transition: all 0.s ease; }
   .reveal .slides section .fragment.visible {
     opacity: 1;
     visibility: visible; }
