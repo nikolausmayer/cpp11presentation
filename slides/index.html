@@ -773,6 +773,228 @@ int main () {
 
 
         <section>
+          <h3> Compile-time assertions </h3>
+          <div style='text-align: left'>
+            Runtime assertions are useful
+            <pre><code data-trim class='cpp'>
+int stupid_division(int a, int b) {
+  assert(b != 0);
+  return (a / b);
+}
+            </code></pre>
+
+            <div class='fragment'>
+              but limited.
+              <pre><code data-trim class='cpp'>
+template &lt;int N&gt;
+class Filter {
+  ...
+}
+              </code></pre>
+              What if <code>Filter</code> is only valid for <code>N&gt;1</code>?
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Compile-time assertions (cont.) </h3>
+          <div style='text-align: left'>
+            Solution 1: Runtime assertion
+            <pre><code data-trim class='cpp'>
+template &lt;int N&gt;
+class Filter {
+  Filter() {
+    if (N&lt;=1) throw std::runtime_error("Filter invalid for N&lt;=1");
+  }
+  ...
+}
+            </code></pre>
+
+            <div class='fragment'>
+              Solution 2: <em>Compile-time</em> (“static”) assertion
+              <pre><code data-trim class='cpp'>
+template &lt;int N&gt;
+class Filter {
+  Filter() {
+    static_assert(N&gt;1, "Filter invalid for N&lt;1");
+  }
+  ...
+}
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> and their trusty sidekicks, type traits </h3>
+          <div style='text-align: left'>
+            <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+T very_small_value() {
+  return (T)0.00001;
+}
+            </code></pre>
+            What if <code>T</code> is an integer type?
+
+            <div class='fragment'>
+              Solution 1: Valid specializations plus fallback
+              <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+T very_small_value() {
+  throw std::runtime_error("Bad type");
+  return (T)0.00001;
+}
+template float very_small_value&lt;float&gt;()  { return 0.00001f; }
+template double very_small_value&lt;double&gt;() { return 0.00001; }
+...
+              </code></pre>
+
+              <div class='fragment'>
+                Problem: Compiler might not issue a warning, and errors only appear at runtime.
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> and their trusty sidekicks, type traits </h3>
+          <div style='text-align: left'>
+            <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+T very_small_value() {
+  return (T)0.00001;
+}
+            </code></pre>
+            What if <code>T</code> is an integer type?
+            <br/>
+
+            Solution 2: <em>Type trait</em> check for floating-point-ness
+            <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+T very_small_value() {
+  static_assert(std::is_floating_point&lt;T&gt;::value,
+                "very_small_value only works for float types");
+  return (T)0.00001;
+}
+            </code></pre>
+
+            <div class='fragment'>
+              Type traits are defined in the <code>type_traits</code> header:<br/>
+              <code>is_enum</code>, <code>is_const</code>, <code>is_move_assignable</code>...
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Speaking of <code>enum</code>... </h3>
+          <div style='text-align: left'>
+            While <code>enum</code>s have <em>underlying types</em>
+            <pre><code data-trim class='text'>
+Standard C++ 7.2/5:
+  The underlying type of an enumeration is an integral type 
+  that can represent all the enumerator values defined in the 
+  enumeration.
+            </code></pre>
+            they are effectively just integers.<br/>
+
+            <div class='fragment'>
+              They also expose their values which can lead to collisions:
+              <pre><code data-trim class='cpp'>
+enum boyfriend_type { rich, nice, cool };
+enum CERN_magnet_status { warm, cool, supercool };
+              </code></pre>
+            </div>
+
+            <div class='fragment'>
+              GCC complains:
+              <pre><code data-trim class='bash'>
+error: redeclaration of ‘cool’
+note: previous declaration ‘boyfriend_type cool’
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Speaking of <code>enum</code>... (cont.) </h3>
+          <div style='text-align: left'>
+            C++11 offers <em>scoped</em> enumerations
+            <div class='fragment'>
+              <pre><code data-trim class='cpp'>
+enum class boyfriend_type { rich, nice, cool };
+enum struct CERN_magnet_status { warm, cool, supercool };
+...
+int magnet = CERN_magnet_status::supercool;  // not ok
+CERN_magnet_status magnet = CERN_magnet_status::supercool;  // ok
+              </code></pre>
+            </div>
+
+            <div class='fragment'>
+              and <em>strongly typed</em> enumerations
+              <pre><code data-trim class='cpp'>
+enum class boyfriend_type : short { rich, nice, cool };
+enum CERN_magnet_status : int { warm, cool, supercool };
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Hashable types </h3>
+          <div style='text-align: left'>
+            In Python, type specific values can simply be stored in a dictionary (= map, hashmap):
+            <pre><code data-trim class='python'>
+type_values = {int: 1, float: 2}
+            </code></pre>
+
+            <div class='fragment'>
+              C++ does not allows this easy way
+              <pre><code data-trim class='cpp'>
+std::map&lt;std::typeinfo, int&gt; type_values;
+type_values[typeid(int)] = 1;
+              </code></pre>
+            </div>
+
+            <div class='fragment'>
+              and a workaround is via structs:
+              <pre><code data-trim class='cpp'>
+template &lt;typename T&gt;
+struct type_values { static const int value = 0; }
+
+template struct type_values&lt;int&gt; { static const int value = 1; }
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3> Hashable types (cont.) </h3>
+          <div style='text-align: left'>
+            C++11 still does not allow
+            <pre><code data-trim class='cpp'>
+std::map&lt;std::typeinfo, int&gt; type_values;
+type_values[typeid(int)] = 1;
+            </code></pre>
+
+            <div class='fragment'>
+              but if offers the hashable <code>type_index</code>:
+              <pre><code data-trim class='cpp'>
+std::map&lt;std::type_index, int&gt; type_values;
+type_values[std::type_index(typeid(int))] = 1;
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
           <h3> Many more things </h3>
           <div style='text-align: left'>
             C++11 offers much more: <br/>
@@ -822,8 +1044,8 @@ int main () {
         </section>
 
 
-
-
+        <section>
+        </section>
 
 
         <section>
