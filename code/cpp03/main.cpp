@@ -73,13 +73,13 @@ float RandomNumber()
 /**
  * A point in 2d space
  */
-struct Point {
-  Point(float x, float y) : x(x), y(y) {}
+struct Pos2d {
+  Pos2d(float x, float y) : x(x), y(y) {}
   float x;
   float y;
 };
 
-std::ostream& operator<<(std::ostream& os, const Point& point)
+std::ostream& operator<<(std::ostream& os, const Pos2d& point)
 {
   os << "(" << point.x << ", " << point.y << ")";
   return os;
@@ -87,30 +87,30 @@ std::ostream& operator<<(std::ostream& os, const Point& point)
 
 
 /**
- * Generate a Point with x and y coordinates uniformly i.i.d.
+ * Generate a Pos2d with x and y coordinates uniformly i.i.d.
  * in [-1, +1]
  */
-Point* RandomPoint()
+Pos2d* RandomPos2d()
 {
-  Point* new_point = new Point(RandomNumber(), RandomNumber());
+  Pos2d* new_point = new Pos2d(RandomNumber(), RandomNumber());
   std::cout << "New point " << *new_point << " created\n";
   return new_point;
 }
 
 
-float ManhattanToOrigin(Point* point)
+float ManhattanToOrigin(Pos2d* point)
 {
-  return std::fabs(point->x) + std::fabs(point->y);
+  return std::abs(point->x) + std::abs(point->y);
 }
 
 
-bool PointIsNearOrigin(Point* point)
+bool Pos2dIsNearOrigin(Pos2d* point)
 {
   return (ManhattanToOrigin(point) < 0.5f);
 }
 
 
-Point* NearestToOrigin(const std::vector<Point*>& points,
+Pos2d* NearestToOrigin(const std::vector<Pos2d*>& points,
                        float& min_distance)
 {
   unsigned int min_index = 0;
@@ -130,20 +130,20 @@ Point* NearestToOrigin(const std::vector<Point*>& points,
 
 int main()
 {
-  std::vector<Point*> points;
+  std::vector<Pos2d*> points;
   for (int i = 0; i < 100; ++i)
-    points.push_back(RandomPoint());
+    points.push_back(RandomPos2d());
 
   int nearOrigin = 0;
   for (unsigned int i = 0; i < points.size(); ++i)
-    if (PointIsNearOrigin(points[i]))
+    if (Pos2dIsNearOrigin(points[i]))
       ++nearOrigin;
 
   std::cout << nearOrigin << " of " << points.size() 
             << " points are near the origin.\n";
 
   float min_distance;
-  Point* nearest_point = NearestToOrigin(points, min_distance);
+  Pos2d* nearest_point = NearestToOrigin(points, min_distance);
   std::cout << "The nearest point was " << *nearest_point
             << " with distance " << min_distance << "\n";
 
