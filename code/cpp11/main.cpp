@@ -28,6 +28,7 @@
 #include <iostream>
 #include <limits>    // std::numeric_limits
 #include <memory>
+#include <type_traits>
 #include <vector>
 #if __cplusplus > 199711L
   #include <random>  // std::random_device, std::mt19937, ...
@@ -74,15 +75,22 @@ float RandomNumber()
 /**
  * A point in 2d space
  */
-struct Point {
-  Point(float x, float y) : x{x}, y{y} {}
+template <typename T>
+struct Pos2d {
+  Pos2d(float x, float y) 
+  : x{x}, y{y} 
+  {
+    static_assert(std::is_floating_point<T>::value,
+                  "'Pos2d' class only works for float types!'");
+  }
   float x;
   float y;
 };
-typedef std::shared_ptr<Point> Point_ptr;
-typedef std::shared_ptr<const Point> Point_cptr;
+typedef std::shared_ptr<Pos2d<float>> Pos2d_ptr;
+typedef std::shared_ptr<const Pos2d<float>> Pos2d_cptr;
 
-std::ostream& operator<<(std::ostream& os, const Point& point)
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Pos2d<T>& point)
 {
   os << "(" << point.x << ", " << point.y << ")";
   return os;
@@ -90,29 +98,29 @@ std::ostream& operator<<(std::ostream& os, const Point& point)
 
 
 /**
- * Generate a Point with x and y coordinates uniformly i.i.d.
+ * Generate a Pos2d with x and y coordinates uniformly i.i.d.
  * in [-1, +1]
  */
-Point_ptr RandomPoint()
+Pos2d_ptr RandomPos2d()
 {
-  auto new_point = std::make_shared<Point>(RandomNumber(), RandomNumber());
+  auto new_point = std::make_shared<Pos2d<float>>(RandomNumber(), RandomNumber());
   std::cout << "New point " << *new_point << " created\n";
   return new_point;
 }
 
 
-float ManhattanToOrigin(Point_cptr point)
+float ManhattanToOrigin(Pos2d_cptr point)
 {
-  return std::fabs(point->x) + std::fabs(point->y);
+  return std::abs(point->x) + std::abs(point->y);
 }
 
 
 
-std::tuple<Point_cptr, float> NearestToOrigin(
-                          const std::vector<Point_ptr>& points
+std::tuple<Pos2d_cptr, float> NearestToOrigin(
+                          const std::vector<Pos2d_ptr>& points
                                              )
 {
-  Point_cptr min_point{nullptr};
+  Pos2d_cptr min_point{nullptr};
   float min_distance = std::numeric_limits<float>::max();
   for (auto point: points)
   {
@@ -129,25 +137,24 @@ std::tuple<Point_cptr, float> NearestToOrigin(
 
 int main()
 {
-  std::vector<Point_ptr> points;
-  for (int i = 0; i < 100; ++i)
-    points.push_back(RandomPoint());
+  std::vector<Pos2d_ptr> points;
+  for (auto i = 0; i < 100; ++i)
+    points.push_back(RandomPos2d());
 
-  auto PointIsNearOrigin = [](Point_cptr point) -> bool
-  {
+  auto Pos2dIsNearOrigin = [](Pos2d_cptr point) -> bool {
     return (ManhattanToOrigin(point) < 0.5f);
   };
 
 
   int nearOrigin = 0;
   for (auto point: points)
-    if (PointIsNearOrigin(point))
+    if (Pos2dIsNearOrigin(point))
       ++nearOrigin;
 
   std::cout << nearOrigin << " of " << points.size() 
             << " points are near the origin.\n";
 
-  Point_cptr nearest_point;
+  Pos2d_cptr nearest_point;
   float min_distance;
   std::tie(nearest_point, min_distance) = NearestToOrigin(points);
   std::cout << "The nearest point was " << *nearest_point
