@@ -995,11 +995,41 @@ type_values[std::type_index(typeid(int))] = 1;
 
 
         <section>
+          <h3> Matlab&reg; vs C++11 </h3>
+          <div style='text-align: left'>
+            <ul>
+              <li class='fragment' data-fragment-index='1'>
+                <span class='fragment' data-fragment-index='1'>no type declarations</span> 
+                <span class='fragment' data-fragment-index='2'> &#10142; <code>auto</code></span>
+              </li>
+              <li class='fragment' data-fragment-index='3'>
+                <span class='fragment' data-fragment-index='3'>automatic memory management</span>  
+                <span class='fragment' data-fragment-index='4'> &#10142; smart pointers</span>
+              </li>
+              <li class='fragment' data-fragment-index='5'>
+                <span class='fragment' data-fragment-index='5'>not free</span>  
+                <span class='fragment' data-fragment-index='6'> &#10142; free<span>
+              </li>
+              <li class='fragment' data-fragment-index='7'>
+                <span class='fragment' data-fragment-index='7'>interpreted</span>  
+                <span class='fragment' data-fragment-index='8'> &#10142; not interpreted<span>
+              </li>
+              <li class='fragment' data-fragment-index='9'>
+                <span class='fragment' data-fragment-index='9'>call-by-value</span>  
+                <span class='fragment' data-fragment-index='10'> &#10142; (smart) pointers, references<span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+
+        <section>
           <h3> Many more things </h3>
           <div style='text-align: left'>
             C++11 offers much more: <br/>
             <span class='fragment'><code>decltype</code>, </span>
             <span class='fragment'>initializer lists, </span>
+            <span class='fragment'><code>constexpr</code>, </span>
             <span class='fragment'>Constructors calling other constructors of the same class,  </span>
             <span class='fragment'><code>override</code> and <code>final</code> keywords,  </span>
             <span class='fragment'>rvalue references,  </span>
@@ -1024,23 +1054,20 @@ type_values[std::type_index(typeid(int))] = 1;
 
 
         <section>
-          <div style='text-align: right;'>
-            <h1> THE END </h1>
-          </div>
           <h3> Summary </h3>
           <div style='text-align: left;'>
             <ul>
-              <li> C++11 takes away much of the C++ grind </li>
-              <li> There is no hard reason not to use it </li>
-              <li> On a <em>remotely</em> up-to-date system, it’s just a keyword away </li>
-              <li> But please, think before you <code>auto</code> </li>
+              <li class='fragment'> C++11 takes away much of the C++ grind </li>
+              <li class='fragment'> There is no hard reason not to use it </li>
+              <li class='fragment'> On a <em>remotely</em> up-to-date system, it’s just a keyword away </li>
+              <li class='fragment'> But please, think before you <code>auto</code> </li>
             </ul>
           </div>
           <br/>
-          <br/>
 
-          <h3> Thank you for you attention! </h3>
-          <h3> Questions? </h3>
+          <h1 class='fragment'> THE END </h1>
+          <h3 class='fragment'> Thank you for you attention! </h3>
+          <h3 class='fragment'> Questions? </h3>
         </section>
 
 
